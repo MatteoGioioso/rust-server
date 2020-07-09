@@ -46,6 +46,14 @@ RUST_START_MODE (DEFAULT: "0" - Determines if the server should update and then 
 RUST_OXIDE_ENABLED (DEFAULT: "0" - Set to 1 to automatically install the latest version of Oxide)
 RUST_OXIDE_UPDATE_ON_BOOT (DEFAULT: "1" - Set to 0 to disable automatic update of Oxide on boot)
 ```
+# SFTP
+
+Change the username and password! SSH has been disabled.
+
+```
+SSH_MASTER_USER="admin"
+SSH_MASTER_PASS="admin"
+```
 
 # Logging and rotating logs
 
