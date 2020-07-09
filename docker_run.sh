@@ -15,4 +15,5 @@
 docker run \
     --name rust-server \
     -p 28015:28015 -p 28015:28015/udp -p 28016:28016 -p 8080:8080 -p 22:22 \
-    --env SSH_MASTER_USER=madeo --env SSH_MASTER_PASS=123 --rm hirvitek/rust-server-sftp
+    --env SSH_MASTER_USER=madeo --env SSH_MASTER_PASS=123 --env RUST_OXIDE_ENABLED=1 \
+    --rm hirvitek/rust-server-sftp
