@@ -6,6 +6,30 @@
 # Print the user we're currently running as
 echo "Running as user: $(whoami)"
 
+# Setup ssh
+ACCESSIBLE_FOLDER=/steamcmd/rust
+sudo -S useradd -m -d /${ACCESSIBLE_FOLDER} -G ssh ${SSH_MASTER_USER} -s /bin/false
+sudo usermod -a -G docker ${SSH_MASTER_USER}
+echo "${SSH_MASTER_USER}:${SSH_MASTER_PASS}" | sudo chpasswd
+
+umask 002
+chgrp docker /${ACCESSIBLE_FOLDER}
+chmod g+s /${ACCESSIBLE_FOLDER}
+
+echo 'PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin' >> /${ACCESSIBLE_FOLDER}/.profile
+
+sudo sh -c "echo ${SSH_MASTER_USER} ALL=NOPASSWD:/bin/rm >> /etc/sudoers"
+sudo sh -c "echo ${SSH_MASTER_USER} ALL=NOPASSWD:/bin/mkdir >> /etc/sudoers"
+sudo sh -c "echo ${SSH_MASTER_USER} ALL=NOPASSWD:/bin/chown >> /etc/sudoers"
+sudo sh -c "echo ${SSH_MASTER_USER} ALL=NOPASSWD:/usr/sbin/useradd >> /etc/sudoers"
+sudo sh -c "echo ${SSH_MASTER_USER} ALL=NOPASSWD:/usr/sbin/deluser >> /etc/sudoers"
+sudo sh -c "echo ${SSH_MASTER_USER} ALL=NOPASSWD:/usr/sbin/chpasswd >> /etc/sudoers"
+
+sudo addgroup sftp
+echo "Starting SSH service"
+sudo service ssh start
+sudo service ssh status
+
 # Define the exit handler
 exit_handler()
 {

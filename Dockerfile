@@ -74,11 +74,23 @@ RUN chown -R 1000:1000 \
     /usr/share/nginx/html \
     /var/log/nginx
 
+
+# Add SSH
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    nano \
+    sudo \
+    openssh-server
+
+COPY sftp_app/ssh_config /etc/ssh/ssh_config
+COPY sftp_app/sshd_config /etc/ssh/sshd_config
+
 # Run as a non-root user by default
 ENV PGID 1000
 ENV PUID 1000
 
 # Expose necessary ports
+EXPOSE 22
 EXPOSE 8080
 EXPOSE 28015
 EXPOSE 28016
@@ -105,12 +117,16 @@ ENV RUST_OXIDE_UPDATE_ON_BOOT "1"
 ENV RUST_SERVER_WORLDSIZE "3500"
 ENV RUST_SERVER_MAXPLAYERS "500"
 ENV RUST_SERVER_SAVE_INTERVAL "600"
+ENV SSH_MASTER_USER "admin"
+ENV SSH_MASTER_PASS "admin"
 
 # Define directories to take ownership of
 ENV CHOWN_DIRS "/app,/steamcmd,/usr/share/nginx/html,/var/log/nginx"
 
 # Expose the volumes
 VOLUME [ "/steamcmd/rust" ]
+
+RUN echo "docker ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/docker && chmod 0440 /etc/sudoers.d/docker
 
 # Start the server
 CMD [ "bash", "/app/start.sh"]
