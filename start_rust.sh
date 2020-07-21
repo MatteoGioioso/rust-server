@@ -3,6 +3,8 @@
 # Enable debugging
 #set -x
 
+export RUST_SERVER_IDENTITY=${RUST_SERVER_IDENTITY}
+
 # Print the user we're currently running as
 echo "Running as user: $(whoami)"
 
@@ -34,6 +36,10 @@ sudo service ssh status
 exit_handler()
 {
 	echo "Shutdown signal received"
+
+    PROCESS_PERCENTAGE=0 \
+    PROCESS_STEP=Stop \
+    node /app/progress_app/app.js
 
 	# Execute the RCON shutdown command
 	node /app/shutdown_app/app.js
@@ -70,6 +76,10 @@ install_or_update()
 # Remove old lock files (used by restart_app/ and update_check.sh)
 rm -fr /tmp/*.lock
 
+PROCESS_PERCENTAGE=5 \
+PROCESS_STEP=Starting \
+node /app/progress_app/app.js
+
 # Create the necessary folder structure
 if [ ! -d "/steamcmd/rust" ]; then
 	echo "Missing /steamcmd/rust, creating.."
@@ -98,6 +108,10 @@ else
 	sed -i "s/app_update 258550.*validate/app_update 258550 validate/g" /app/install.txt
 fi
 
+PROCESS_PERCENTAGE=15 \
+PROCESS_STEP=StartInstalling \
+node /app/progress_app/app.js
+
 # Disable auto-update if start mode is 2
 if [ "$RUST_START_MODE" = "2" ]; then
 	# Check that Rust exists in the first place
@@ -121,6 +135,10 @@ else
 	fi
 fi
 
+PROCESS_PERCENTAGE=40 \
+PROCESS_STEP=InstallingRust \
+node /app/progress_app/app.js
+
 # Check if Oxide is enabled
 if [ "$RUST_OXIDE_ENABLED" = "1" ]; then
 	# Next check if Oxide doesn't' exist, or if we want to always update it
@@ -140,6 +158,10 @@ if [ "$RUST_OXIDE_ENABLED" = "1" ]; then
 		chmod 755 /steamcmd/rust/CSharpCompiler.x86_x64 > /dev/null 2>&1 &
 	fi
 fi
+
+PROCESS_PERCENTAGE=50 \
+PROCESS_STEP=InstallingOxide \
+node /app/progress_app/app.js
 
 # Start mode 1 means we only want to update
 if [ "$RUST_START_MODE" = "1" ]; then
@@ -172,6 +194,10 @@ if [ ! -z ${RUST_RCON_WEB+x} ]; then
 	fi
 fi
 
+PROCESS_PERCENTAGE=65 \
+PROCESS_STEP=StartingRCON \
+node /app/progress_app/app.js
+
 # Disable logrotate if "-logfile" is set in $RUST_STARTUP_COMMAND
 LOGROTATE_ENABLED=1
 RUST_STARTUP_COMMAND_LOWERCASE=`echo "$RUST_STARTUP_COMMAND" | sed 's/./\L&/g'`
@@ -201,6 +227,10 @@ if [ "$LOGROTATE_ENABLED" = "1" ]; then
 else
 	echo "Log rotation disabled!"
 fi
+
+PROCESS_PERCENTAGE=70 \
+PROCESS_STEP=StartingRust \
+node /app/progress_app/app.js
 
 # Disable logging to stdout/stderr if "-logfile /dev/" is used
 STDLOG_ENABLED=1

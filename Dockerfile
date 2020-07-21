@@ -46,6 +46,10 @@ ADD scheduler_app/ /app/scheduler_app/
 WORKDIR /app/scheduler_app
 RUN npm install
 
+# Setup progress reporting support
+ADD progress_app/ /app/progress_app/
+WORKDIR /app/progress_app
+
 # Setup rcon command relay app
 ADD rcon_app/ /app/rcon_app/
 WORKDIR /app/rcon_app
@@ -95,6 +99,7 @@ EXPOSE 8080
 EXPOSE 28015
 EXPOSE 28016
 EXPOSE 28082
+EXPOSE 3000
 
 # Setup default environment variables for the server
 ENV RUST_SERVER_STARTUP_ARGUMENTS "-batchmode -load -nographics +server.secure 1"
